@@ -5,12 +5,18 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
+    host: true, // Listen on all addresses
     port: 5173,
     strictPort: false,
     hmr: {
       clientPort: 443,
       protocol: 'wss'
-    }
+    },
+    // Allow access from any host
+    allowedHosts: [
+      '.sandbox.novita.ai',
+      'localhost',
+      '127.0.0.1'
+    ]
   }
 })
