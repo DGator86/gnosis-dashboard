@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { websocketService } from "../services/websocket";
+import { alpacaWebSocketService } from "../services/alpacaWebSocket";
 
 export function useWebSocket(symbol: string) {
   const [price, setPrice] = useState<number | null>(null);
@@ -7,7 +7,7 @@ export function useWebSocket(symbol: string) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    websocketService.connect();
+    alpacaWebSocketService.connect();
     setIsConnected(true);
 
     const callback = (sym: string, newPrice: number, priceChange: number) => {
@@ -15,10 +15,10 @@ export function useWebSocket(symbol: string) {
       setChange(priceChange);
     };
 
-    websocketService.subscribe(symbol, callback);
+    alpacaWebSocketService.subscribe(symbol, callback);
 
     return () => {
-      websocketService.unsubscribe(symbol, callback);
+      alpacaWebSocketService.unsubscribe(symbol, callback);
     };
   }, [symbol]);
 

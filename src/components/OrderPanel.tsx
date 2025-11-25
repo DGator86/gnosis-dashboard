@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
+import { alpacaAPI } from "../services/alpaca";
 import type { OrderType, OrderSide } from "../types";
 import toast from "react-hot-toast";
 
@@ -11,7 +12,7 @@ export const OrderPanel: React.FC = () => {
   const [price, setPrice] = useState("");
   const [stopPrice, setStopPrice] = useState("");
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!quantity || parseFloat(quantity) <= 0) {
@@ -29,22 +30,44 @@ export const OrderPanel: React.FC = () => {
       return;
     }
 
-    addOrder({
-      symbol: selectedSymbol,
-      type: orderType,
-      side,
-      quantity: parseFloat(quantity),
-      price: price ? parseFloat(price) : undefined,
-      stopPrice: stopPrice ? parseFloat(stopPrice) : undefined,
-      status: "PENDING",
-    });
+    const loadingToast = toast.loading("Placing order...");
 
-    toast.success(`${side} order placed for ${quantity} shares of ${selectedSymbol}`);
+    try {
+      // Place order via Alpaca API
+      await alpacaAPI.placeOrder({
+        symbol: selectedSymbol,
+        qty: parseFloat(quantity),
+        side: side.toLowerCase() as "buy" | "sell",
+        type: orderType.toLowerCase() as any,
+        time_in_force: "day",
+        limit_price: price ? parseFloat(price) : undefined,
+        stop_price: stopPrice ? parseFloat(stopPrice) : undefined,
+      });
 
-    // Reset form
-    setQuantity("");
-    setPrice("");
-    setStopPrice("");
+      // Also add to local store
+      addOrder({
+        symbol: selectedSymbol,
+        type: orderType,
+        side,
+        quantity: parseFloat(quantity),
+        price: price ? parseFloat(price) : undefined,
+        stopPrice: stopPrice ? parseFloat(stopPrice) : undefined,
+        status: "PENDING",
+      });
+
+      toast.success(`${side} order placed for ${quantity} shares of ${selectedSymbol}`, {
+        id: loadingToast,
+      });
+
+      // Reset form
+      setQuantity("");
+      setPrice("");
+      setStopPrice("");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to place order", {
+        id: loadingToast,
+      });
+    }
   };
 
   return (

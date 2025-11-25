@@ -772,6 +772,168 @@
   }
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Options Flow Panel */
+.options-flow-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flow-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.flow-count {
+  font-size: 0.8rem;
+  color: var(--text-mute);
+}
+
+.flow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.flow-item {
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  transition: all var(--transition-fast);
+}
+
+.flow-item:hover {
+  border-color: var(--accent-soft);
+  transform: translateX(2px);
+}
+
+.flow-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.flow-type {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.flow-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.flow-badge.call {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.flow-badge.put {
+  background: rgba(249, 115, 115, 0.15);
+  color: var(--danger);
+}
+
+.flow-sentiment {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.flow-sentiment.bullish {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.flow-sentiment.bearish {
+  background: rgba(249, 115, 115, 0.1);
+  color: var(--danger);
+}
+
+.flow-sentiment.neutral {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--text-mute);
+}
+
+.flow-premium {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.flow-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.flow-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.flow-label {
+  color: var(--text-mute);
+}
+
+.flow-value {
+  font-weight: 500;
+}
+
+.flow-time {
+  font-size: 0.7rem;
+  color: var(--text-mute);
+  text-align: right;
+}
+
+/* Whale Activity Indicator */
+.whale-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(79, 70, 229, 0.15);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.whale-indicator svg {
+  font-size: 0.9rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .portfolio-sections,
@@ -781,5 +943,9 @@
 
   .modal-content {
     max-width: 95%;
+  }
+
+  .flow-details {
+    grid-template-columns: 1fr;
   }
 }

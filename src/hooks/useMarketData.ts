@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../services/api";
+import { api } from "../services/apiIntegrated";
 import type { CandleData, SymbolInfo, TimeFrame } from "../types";
 
 export function useMarketData(symbol: string, timeFrame: TimeFrame) {

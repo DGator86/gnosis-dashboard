@@ -25,7 +25,7 @@ import { useAppStore } from "./store/useAppStore";
 import { useMarketData } from "./hooks/useMarketData";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { calculateIndicators } from "./utils/indicators";
-import { api } from "./services/api";
+import { api } from "./services/apiIntegrated";
 
 import { CandlestickChart } from "./components/CandlestickChart";
 import { VolumeChart } from "./components/VolumeChart";
@@ -35,6 +35,7 @@ import { AlertsPanel } from "./components/AlertsPanel";
 import { PortfolioPanel } from "./components/PortfolioPanel";
 import { LoginModal } from "./components/LoginModal";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { OptionsFlowPanel } from "./components/OptionsFlowPanel";
 
 import "./index.css";
 import "./enhanced.css";
@@ -65,6 +66,7 @@ const App: React.FC = () => {
   const [showIndicators, setShowIndicators] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [bottomTab, setBottomTab] = useState<"ideas" | "options">("ideas");
 
   // Get market data
   const { candles, symbolInfo, loading } = useMarketData(selectedSymbol, timeFrame);
@@ -495,51 +497,65 @@ const App: React.FC = () => {
             </aside>
           </div>
 
-          {/* Bottom: Trade Idea Feed + Indicators */}
+          {/* Bottom: Trade Idea Feed + Options Flow */}
           <section className="panel panel-bottom">
             <div className="tab-nav">
-              <button className="tab-btn active">Trade Ideas</button>
-              {indicators.find((i) => i.type === "RSI" || i.type === "MACD") && (
-                <button className="tab-btn">Indicators</button>
-              )}
+              <button
+                className={`tab-btn ${bottomTab === "ideas" ? "active" : ""}`}
+                onClick={() => setBottomTab("ideas")}
+              >
+                Trade Ideas
+              </button>
+              <button
+                className={`tab-btn ${bottomTab === "options" ? "active" : ""}`}
+                onClick={() => setBottomTab("options")}
+              >
+                Options Flow
+              </button>
             </div>
 
             <div className="panel-body panel-body-tradeideas">
-              {tradeIdeas.length === 0 ? (
-                <div className="tradeidea-empty">
-                  No ideas yet for {selectedSymbol}. AI trade agent is analyzing...
-                </div>
+              {bottomTab === "ideas" ? (
+                <>
+                  {tradeIdeas.length === 0 ? (
+                    <div className="tradeidea-empty">
+                      Analyzing {selectedSymbol}... AI-generated trade ideas will appear here.
+                    </div>
+                  ) : (
+                    tradeIdeas
+                      .sort((a, b) => b.confidence - a.confidence)
+                      .map((idea) => (
+                        <article key={idea.id} className="tradeidea-card">
+                          <div className="tradeidea-header">
+                            <div className="tradeidea-title">{idea.title}</div>
+                            <div className="tradeidea-tags">
+                              <span
+                                className={
+                                  "pill pill-direction-" +
+                                  idea.direction.toLowerCase()
+                                }
+                              >
+                                {idea.direction === "LONG" ? "Long Bias" : "Short Bias"}
+                              </span>
+                              <span className="pill">
+                                {idea.horizon === "INTRADAY"
+                                  ? "Intraday"
+                                  : idea.horizon === "SWING"
+                                  ? "Swing (2–10 days)"
+                                  : "Position (weeks+)"}
+                              </span>
+                              <span className="pill pill-confidence">
+                                Confidence: {(idea.confidence * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
+                          <p className="tradeidea-thesis">{idea.thesis}</p>
+                        </article>
+                      ))
+                  )}
+                </>
               ) : (
-                tradeIdeas
-                  .sort((a, b) => b.confidence - a.confidence)
-                  .map((idea) => (
-                    <article key={idea.id} className="tradeidea-card">
-                      <div className="tradeidea-header">
-                        <div className="tradeidea-title">{idea.title}</div>
-                        <div className="tradeidea-tags">
-                          <span
-                            className={
-                              "pill pill-direction-" +
-                              idea.direction.toLowerCase()
-                            }
-                          >
-                            {idea.direction === "LONG" ? "Long Bias" : "Short Bias"}
-                          </span>
-                          <span className="pill">
-                            {idea.horizon === "INTRADAY"
-                              ? "Intraday"
-                              : idea.horizon === "SWING"
-                              ? "Swing (2–10 days)"
-                              : "Position (weeks+)"}
-                          </span>
-                          <span className="pill pill-confidence">
-                            Confidence: {(idea.confidence * 100).toFixed(0)}%
-                          </span>
-                        </div>
-                      </div>
-                      <p className="tradeidea-thesis">{idea.thesis}</p>
-                    </article>
-                  ))
+                <OptionsFlowPanel symbol={selectedSymbol} />
               )}
             </div>
           </section>
